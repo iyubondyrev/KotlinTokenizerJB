@@ -31,16 +31,15 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Install Git
-        run: |
-          apt-get update
-          apt-get install -y git
-        working-directory: KotlinTokenizerJB
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: kotlin-spec
 
       - name: Install kotlin-grammar-parser
         run: |
           cd kotlin-spec
           ./gradlew :grammar:publishToMavenLocal
+          ./gradlew publishToMavenLocal
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
