@@ -45,7 +45,7 @@ jobs:
         working-directory: ./grammar-tools
 
       - name: Build Tokenizer JAR
-        run: ./gradlew TokenizerJar
+        run: ./gradlew TokenizeJar
         working-directory: ./KotlinTokenizerJB
 
       - name: Build GetPopularLiterals JAR
