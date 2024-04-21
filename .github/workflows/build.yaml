@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install Git
-        run: apt-get update && apt-get install -y git
+        run: apk add --no-cache git
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
