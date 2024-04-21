@@ -11,15 +11,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     container:
-      image: openjdk:17
+      image: openjdk:17-slim
+
 
     steps:
       - uses: actions/checkout@v2
 
       - name: Install Git
-        run: apk add --no-cache git
+        run: |
+          apt-get update
+          apt-get install -y git
 
       - name: Set up JDK 17
         uses: actions/setup-java@v2
