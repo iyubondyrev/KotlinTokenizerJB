@@ -126,7 +126,7 @@ fun main(args: Array<String>) {
 
     var fileCount = 0
     val resultFilePath = "$outputDir/$resultFile"
-    File(resultFilePath).bufferedWriter().use { writer ->
+    File(resultFilePath).bufferedWriter(UTF_8).use { writer ->
         File("$baseDir/$fileNameWithPaths").readLines().forEach { path ->
 
             val fullPath = "$baseDir/$path"

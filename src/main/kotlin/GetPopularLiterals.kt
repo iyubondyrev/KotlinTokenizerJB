@@ -108,9 +108,9 @@ fun main(args: Array<String>) {
     )
 
     val jsonString = Json.encodeToString(popularLiterals)
-    File(outputLiteralsPath).writeText(jsonString)
+    File(outputLiteralsPath).writeText(jsonString, UTF_8)
 
-    File(outputBadFilesPath).writeText(badFiles.joinToString("\n"))
+    File(outputBadFilesPath).writeText(badFiles.joinToString("\n"), UTF_8)
     badFiles.forEach { path ->
         val fileToDelete = File(path)
         if (fileToDelete.exists()) {
