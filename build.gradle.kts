@@ -34,7 +34,7 @@ val getPopularLiteralsJar by tasks.creating(Jar::class) {
     dependsOn("test")
     archiveBaseName.set("GetPopularLiterals")
     manifest {
-        attributes("Main-Class" to "org.example.GetPopularLiteralsKt")
+        attributes("Main-Class" to "org.tokenizer.GetPopularLiteralsKt")
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)
@@ -46,7 +46,7 @@ val tokenizeJar by tasks.creating(Jar::class) {
     dependsOn("test")
     archiveBaseName.set("Tokenize")
     manifest {
-        attributes("Main-Class" to "org.example.TokenizeKt")
+        attributes("Main-Class" to "org.tokenizer.TokenizeKt")
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)
