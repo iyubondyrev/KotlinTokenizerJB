@@ -1,12 +1,8 @@
-name: Build and Upload JAR
+name: Build and Upload JAR on Release
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  release:
+    types: [created]
 
 jobs:
   build:
@@ -52,8 +48,22 @@ jobs:
         run: ./gradlew GetPopularLiteralsJar
         working-directory: ./KotlinTokenizerJB
 
-      - name: Upload JAR to GitHub Artifacts
-        uses: actions/upload-artifact@v2
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: My-Kotlin-Jars
-          path: KotlinTokenizerJB/build/libs/*.jar
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./KotlinTokenizerJB/build/libs/GetPopularLiterals.jar
+          asset_name: GetPopularLiterals.jar
+          asset_content_type: application/java-archive
+
+      - name: Upload JAR to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ./KotlinTokenizerJB/build/libs/Tokenize.jar
+          asset_name: Tokenize.jar
+          asset_content_type: application/java-archive
