@@ -52,6 +52,9 @@ fun processTokens(tokens: KotlinTokensList, popularLiterals: PopularLiterals): S
             "NL", "UNICODE_CLASS_NL", "Inside_NL" -> {
                 addEOL(processedTokens)
             }
+            "ErrorCharacter" -> { // if there is some crazy bytes we most likely want to skip this file
+                return ""
+            }
             else -> {
                 // because some tokens has newlines/whitespaces in their text representation
                 trimTokenTextAndAdd(tokens[i].text, processedTokens)

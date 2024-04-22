@@ -129,6 +129,28 @@ class ProcessTokensTest {
                 " </s>\n", result)
     }
 
+    @Test
+    fun `processTokens ErrorCharacters`() {
+        var tokens = tokenizeKotlinCode("val x = 1\n" +
+                "\u2028\n" +
+                "val y = 2")
+
+        val popularLiterals = PopularLiterals(
+            mutableListOf(),
+            mutableListOf(),
+            mutableListOf("1", "2")
+        )
+
+        var result = processTokens(tokens, popularLiterals)
+        assertEquals("", result)
+
+        tokens = tokenizeKotlinCode("val x = 1\n" +
+                "\u000Bval y = 2")
+        result = processTokens(tokens, popularLiterals)
+        assertEquals("", result)
+    }
+
+
 
     @Test
     fun `processTokens skips bad tokens`() {

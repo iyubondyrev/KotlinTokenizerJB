@@ -76,7 +76,10 @@ fun processChar(charToken: KotlinToken): String {
 
 fun trimTokenTextAndAdd(tokenText: String, processedTokens: MutableList<String>) {
     // because some tokens has newlines/whitespaces in their text representation
-    val withoutNewLines = tokenText.trim();
+    val withoutNewLines = tokenText.trim()
+    if (withoutNewLines.isEmpty()) {
+        return
+    }
     if (tokenText.startsWith("\n")) {
         addEOL(processedTokens)
     }

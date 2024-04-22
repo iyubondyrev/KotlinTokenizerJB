@@ -90,7 +90,6 @@ fun main(args: Array<String>) {
             val fileContent = File(fullPath).readText(UTF_8)
             val tokens = tokenizeKotlinCode(fileContent)
             updatePopularLiterals(tokens, stringLiterals, charLiterals, numLiterals)
-
         } catch (e: KotlinLexerException) {
             badFiles.add(fullPath)
         } catch (e: IndexOutOfBoundsException) {
