@@ -29,7 +29,7 @@ fun updatePopularLiterals(tokens: KotlinTokensList, stringLiterals: MutableMap<S
             "QUOTE_OPEN", "TRIPLE_QUOTE_OPEN" -> {
                 val (stringLiteral, newI) = processString(tokens, i)
                 // python and java literals.json do not have an empty string. so we won't
-                if (stringLiterals.isNotEmpty()) {
+                if (stringLiteral.isNotEmpty()) {
                     stringLiterals[stringLiteral] = stringLiterals.getOrDefault(stringLiteral, 0) + 1
                 }
                 i = newI // points to the last quote
