@@ -16,6 +16,7 @@ dependencies {
     implementation("commons-cli:commons-cli:1.4")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+    implementation("com.google.guava:guava:30.1-jre")
     testImplementation(kotlin("test"))
 }
 

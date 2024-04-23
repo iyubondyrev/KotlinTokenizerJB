@@ -9,6 +9,8 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.spec.grammar.tools.tokenizeKotlinCode
 import org.jetbrains.kotlin.spec.grammar.tools.KotlinTokensList
 import kotlin.text.Charsets.UTF_8
+import com.google.common.base.CharMatcher;
+
 
 
 fun processTokens(tokens: KotlinTokensList, popularLiterals: PopularLiterals): String {
@@ -72,6 +74,14 @@ fun processTokens(tokens: KotlinTokensList, popularLiterals: PopularLiterals): S
         // because in this case they are most likely not good
         // they might be lexically correct, but in most cases they are trash
         if (stringToken.contains("\n") || stringToken.contains("  ")) {
+            badTokens = true
+        }
+        val isAscii = CharMatcher.ascii().matchesAllOf(stringToken)
+        // if there are non-ascii chars in the token text representation
+        // then we want to skip this file, because with non-ascii chars BPE
+        // is going crazy. I checked the datasets for python and java (CodeXGLUE)
+        // and there are no non-ascii chars at all, so we won't have them as well
+        if (!isAscii) {
             badTokens = true
         }
     }

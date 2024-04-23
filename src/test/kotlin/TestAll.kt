@@ -162,6 +162,25 @@ class ProcessTokensTest {
         assertEquals("", result, "Should return an empty string for bad token patterns")
     }
 
+    @Test
+    fun `processTokens skips non-ascii`() {
+        var tokens = tokenizeKotlinCode("val с = 1") // russian c
+
+        val popularLiterals = PopularLiterals(
+            mutableListOf("привет"),
+            mutableListOf(),
+            mutableListOf("1", "2")
+        )
+
+        var result = processTokens(tokens, popularLiterals)
+        assertEquals("", result)
+
+        tokens = tokenizeKotlinCode("val h = \"привет\"")
+        result = processTokens(tokens, popularLiterals)
+        // we can keep non-ascii in str_lit because bpe does not touch special symbols like this
+        assertEquals("<s> val h = \"<STR_LIT:привет>\" </s>\n", result)
+    }
+
 }
 
 
@@ -210,5 +229,18 @@ class PopularLiteralsTest {
         assertEquals(2, charLiterals["c"])
         assertEquals(1, numLiterals["1.2"])
         assertEquals(1, numLiterals["0xDEADBEEF"])
+    }
+
+    @Test
+    fun `test updatePopularLiterals empty string`() {
+        val tokens = tokenizeKotlinCode("var a = \"\"\nvar c_ = \"\"")
+
+        val stringLiterals = mutableMapOf<String, Int>()
+        val charLiterals = mutableMapOf<String, Int>()
+        val numLiterals = mutableMapOf<String, Int>()
+
+        updatePopularLiterals(tokens, stringLiterals, charLiterals, numLiterals)
+
+        assertEquals(null, charLiterals[""])
     }
 }
