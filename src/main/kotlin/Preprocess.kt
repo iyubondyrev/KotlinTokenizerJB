@@ -58,6 +58,8 @@ fun main(args: Array<String>) {
     val tokensThresholdToParseStr = cmd.getOptionValue("tokens_threshold_to_parse", "10000")
     val threshold = tokensThresholdToParseStr.toInt()
 
+    println("Tokens threshold to parse: $threshold")
+
     createDirectory(outputDirTokenCompletion)
     createDirectory(outputDirMethodGeneration)
 
