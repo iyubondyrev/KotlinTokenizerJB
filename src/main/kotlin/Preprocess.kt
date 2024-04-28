@@ -55,7 +55,7 @@ fun main(args: Array<String>) {
     val resultFileTokenCompletion = cmd.getOptionValue("result_file_token_completion", "train.txt")
     val resultFileMethodGeneration = cmd.getOptionValue("result_file_method_generation", "train.json")
     val literalFile = cmd.getOptionValue("literal_file", "literals.json")
-    val tokensThresholdToParseStr = cmd.getOptionValue("literal_file", "10000")
+    val tokensThresholdToParseStr = cmd.getOptionValue("tokens_threshold_to_parse", "10000")
     val threshold = tokensThresholdToParseStr.toInt()
 
     createDirectory(outputDirTokenCompletion)
@@ -90,7 +90,8 @@ fun main(args: Array<String>) {
                         functions.forEach { functionMap ->
                             jsonWriter.write(Json.encodeToString(functionMap) + "\n")
                         }
-                    } catch (_: KotlinParserException) {
+                    } catch (e: KotlinParserException) {
+                        println(fullPath)
                     }
                       catch (_: IndexOutOfBoundsException) {
                     }
