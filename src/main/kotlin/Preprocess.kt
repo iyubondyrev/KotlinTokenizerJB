@@ -38,6 +38,7 @@ fun main(args: Array<String>) {
     options.addOption("rt", "result_file_token_completion", true, "Result file for token completion")
     options.addOption("rm", "result_file_method_generation", true, "Result file for method generation")
     options.addOption("l", "literal_file_path", true, "Literal file")
+    options.addOption("t", "tokens_threshold_to_parse", true, "Max number of tokens to parse")
 
     val parser = DefaultParser()
     val cmd = try {
@@ -54,6 +55,8 @@ fun main(args: Array<String>) {
     val resultFileTokenCompletion = cmd.getOptionValue("result_file_token_completion", "train.txt")
     val resultFileMethodGeneration = cmd.getOptionValue("result_file_method_generation", "train.json")
     val literalFile = cmd.getOptionValue("literal_file", "literals.json")
+    val tokensThresholdToParseStr = cmd.getOptionValue("literal_file", "10000")
+    val threshold = tokensThresholdToParseStr.toInt()
 
     createDirectory(outputDirTokenCompletion)
     createDirectory(outputDirMethodGeneration)
@@ -78,7 +81,7 @@ fun main(args: Array<String>) {
                     writer.write("<s> $resultString </s>\n")
                 }
 
-                if (resultString.isNotEmpty() && tokens.size < 3000) {
+                if (resultString.isNotEmpty() && tokens.size < threshold) {
                     try {
                         val root = parseKotlinCode(tokens)
                         val listOfNodes = mutableListOf<KotlinParseTree>()
