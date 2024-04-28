@@ -43,11 +43,11 @@ val getPopularLiteralsJar by tasks.creating(Jar::class) {
 }
 
 // Creating a Jar for Preprocess
-val tokenizeJar by tasks.creating(Jar::class) {
+val preprocessJar by tasks.creating(Jar::class) {
     dependsOn("test")
-    archiveBaseName.set("Tokenize")
+    archiveBaseName.set("Preprocess")
     manifest {
-        attributes("Main-Class" to "org.tokenizer.TokenizeKt")
+        attributes("Main-Class" to "org.tokenizer.PreprocessKt")
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     from(sourceSets.main.get().output)

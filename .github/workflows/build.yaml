@@ -40,8 +40,8 @@ jobs:
         run: ./gradlew publishToMavenLocal
         working-directory: ./grammar-tools
 
-      - name: Build Tokenizer JAR
-        run: ./gradlew TokenizeJar
+      - name: Build Preprocess JAR
+        run: ./gradlew PreprocessJar
         working-directory: ./KotlinTokenizerJB
 
       - name: Build GetPopularLiterals JAR
@@ -64,6 +64,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: ./KotlinTokenizerJB/build/libs/Tokenize.jar
-          asset_name: Tokenize.jar
+          asset_path: ./KotlinTokenizerJB/build/libs/Preprocess.jar
+          asset_name: Preprocess.jar
           asset_content_type: application/java-archive
