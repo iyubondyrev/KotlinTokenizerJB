@@ -78,7 +78,7 @@ fun main(args: Array<String>) {
                     writer.write("<s> $resultString </s>\n")
                 }
 
-                if (resultString.isNotEmpty()) {
+                if (resultString.isNotEmpty() && tokens.size < 3000) {
                     try {
                         val root = parseKotlinCode(tokens)
                         val listOfNodes = mutableListOf<KotlinParseTree>()
@@ -88,12 +88,13 @@ fun main(args: Array<String>) {
                             jsonWriter.write(Json.encodeToString(functionMap) + "\n")
                         }
                     } catch (_: KotlinParserException) {
-                    } catch (_: IndexOutOfBoundsException) {
+                    }
+                      catch (_: IndexOutOfBoundsException) {
                     }
                 }
 
                 fileCount++
-                if (fileCount % 1000 == 0) {
+                if (fileCount % 100 == 0) {
                     println("Preprocessed $fileCount files")
                 }
             }
