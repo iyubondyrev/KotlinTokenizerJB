@@ -92,8 +92,7 @@ fun main(args: Array<String>) {
                         functions.forEach { functionMap ->
                             jsonWriter.write(Json.encodeToString(functionMap) + "\n")
                         }
-                    } catch (e: KotlinParserException) {
-                        println(fullPath)
+                    } catch (_: KotlinParserException) {
                     }
                       catch (_: IndexOutOfBoundsException) {
                     }
