@@ -545,7 +545,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings simple`() {
         val tokens = tokenizeKotlinCode(simpleExample)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -569,7 +569,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings 2 functions`() {
         val tokens = tokenizeKotlinCode(simpleExample2Functions)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -601,7 +601,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nonAsciiBody`() {
         val tokens = tokenizeKotlinCode(exampleWithNonAsciiBody)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -618,7 +618,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nonAsciiSignature`() {
         val tokens = tokenizeKotlinCode(exampleWithNonAsciiSignature)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -635,7 +635,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nonAsciiDocstring`() {
         val tokens = tokenizeKotlinCode(exampleWithNonAsciiDocstring)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -656,7 +656,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nestedFunction`() {
         val tokens = tokenizeKotlinCode(exampleWithNestedFunction)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -679,7 +679,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nestedFunction2`() {
         val tokens = tokenizeKotlinCode(exampleWithNestedFunction2)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -702,7 +702,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nestedFunctionWithDocstring`() {
         val tokens = tokenizeKotlinCode(exampleWithNestedFunctionDocstring)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -725,7 +725,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings nestedFunctionWithDocstring2`() {
         val tokens = tokenizeKotlinCode(exampleWithNestedFunctionDocstring2)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -748,7 +748,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings OtherTokensAfterDoc`() {
         val tokens = tokenizeKotlinCode(exampleWithOtherTokensAfterDoc)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -770,7 +770,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings NewLinesAfterDoc`() {
         val tokens = tokenizeKotlinCode(exampleWithNewLinesAfterDoc)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -794,7 +794,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings complicated`() {
         val tokens = tokenizeKotlinCode(complicatedExample)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -820,7 +820,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings functionInClass`() {
         val tokens = tokenizeKotlinCode(exampleFunctionInClass)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -846,7 +846,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings functionInClassInClass`() {
         val tokens = tokenizeKotlinCode(exampleFunctionInClassInClass)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),
@@ -877,7 +877,7 @@ interface MyInterface {
     fun `test findFunctionsAndDocstrings functionInInterface`() {
         val tokens = tokenizeKotlinCode(exampleFunctionInInterface)
         val root = parseKotlinCode(tokens)
-        val listOfNodes = mutableListOf<KotlinParseTree>()
+        val listOfNodes = mutableListOf<MyNode>()
         listFromNode(root, listOfNodes)
         val popularLiterals = PopularLiterals(
             mutableListOf(),

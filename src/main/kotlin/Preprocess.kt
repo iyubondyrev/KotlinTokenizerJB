@@ -7,10 +7,7 @@ import org.apache.commons.cli.ParseException
 import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import org.jetbrains.kotlin.spec.grammar.tools.KotlinParseTree
-import org.jetbrains.kotlin.spec.grammar.tools.KotlinParserException
-import org.jetbrains.kotlin.spec.grammar.tools.parseKotlinCode
-import org.jetbrains.kotlin.spec.grammar.tools.tokenizeKotlinCode
+import org.jetbrains.kotlin.spec.grammar.tools.*
 import java.lang.IndexOutOfBoundsException
 import kotlin.text.Charsets.UTF_8
 
@@ -69,38 +66,50 @@ fun main(args: Array<String>) {
     var fileCount = 0
     val resultFileTokenCompletionPath = "$outputDirTokenCompletion/$resultFileTokenCompletion"
     val resultMethodGenerationPath = "$outputDirMethodGeneration/$resultFileMethodGeneration"
-    File(resultFileTokenCompletionPath).bufferedWriter(UTF_8).use { writer ->
-        File(resultMethodGenerationPath).bufferedWriter(UTF_8).use { jsonWriter ->
-            File("$baseDir/$fileNameWithPaths").readLines().forEach { path ->
 
-                val fullPath = "$baseDir/$path"
-                val fileContent = File(fullPath).readText(UTF_8)
-                val tokens = tokenizeKotlinCode(fileContent)
+    var fullPath: String
+    var fileContent: String
+    var tokens: KotlinTokensList
+    var resultString: String
+    var root: KotlinParseTree
+    val listOfNodes = mutableListOf<MyNode>()
+    var functions: List<Map<String, String>>
 
-                val resultString = processTokens(tokens, popularLiterals)
+    File(resultFileTokenCompletionPath).writer(UTF_8).use { writer ->
+        File(resultMethodGenerationPath).writer(UTF_8).use { jsonWriter ->
+            File("$baseDir/$fileNameWithPaths").bufferedReader(UTF_8).useLines { lines ->
+                lines.forEach { path ->
+                    fullPath = "$baseDir/$path"
+                    fileContent = File(fullPath).readText(UTF_8)
+                    tokens = tokenizeKotlinCode(fileContent)
+                    resultString = processTokens(tokens, popularLiterals)
 
-                if (resultString.isNotEmpty()) {
-                    writer.write("<s> $resultString </s>\n")
-                }
+                    if (resultString.isNotEmpty()) {
+                        writer.write("<s> $resultString </s>\n")
+                    }
 
-                if (resultString.isNotEmpty() && tokens.size < threshold) {
-                    try {
-                        val root = parseKotlinCode(tokens)
-                        val listOfNodes = mutableListOf<KotlinParseTree>()
-                        listFromNode(root, listOfNodes)
-                        val functions = findFunctionsAndDocstrings(listOfNodes, tokens, popularLiterals)
-                        functions.forEach { functionMap ->
-                            jsonWriter.write(Json.encodeToString(functionMap) + "\n")
+                    if (resultString.isNotEmpty() && tokens.size < threshold) {
+                        println(fullPath)
+                        try {
+                            root = parseKotlinCode(tokens)
+                            listFromNode(root, listOfNodes)
+                            functions = findFunctionsAndDocstrings(listOfNodes, tokens, popularLiterals)
+                            functions.forEach { functionMap ->
+                                jsonWriter.write(Json.encodeToString(functionMap) + "\n")
+                            }
+                            listOfNodes.clear()
+                        } catch (_: KotlinParserException) {
+                        } catch (_: IndexOutOfBoundsException) {
                         }
-                    } catch (_: KotlinParserException) {
                     }
-                      catch (_: IndexOutOfBoundsException) {
-                    }
-                }
 
-                fileCount++
-                if (fileCount % 100 == 0) {
-                    println("Preprocessed $fileCount files")
+                    fileCount++
+                    if (fileCount % 100 == 0) {
+                        println("Preprocessed $fileCount files")
+                    }
+                    System.gc()
+                    writer.flush()
+                    jsonWriter.flush()
                 }
             }
         }

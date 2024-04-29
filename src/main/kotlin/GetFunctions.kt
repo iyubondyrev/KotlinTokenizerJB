@@ -4,9 +4,15 @@ import com.google.common.base.CharMatcher
 import junit.framework.TestCase.assertEquals
 import org.jetbrains.kotlin.spec.grammar.tools.*
 
+class MyNode(
+    val name: String,
+    val text: String?,
+    val childrenNumber: Int
+)
 
-fun listFromNode(node: KotlinParseTree, resultList: MutableList<KotlinParseTree>) {
-    resultList.add(node)
+fun listFromNode(node: KotlinParseTree, resultList: MutableList<MyNode>) {
+    val myNode = MyNode(name = node.name, text = node.text, childrenNumber = node.children.size)
+    resultList.add(myNode)
     for (child in node.children) {
         listFromNode(child, resultList)
     }
@@ -34,8 +40,8 @@ fun findDocString(tokens: KotlinTokensList, indexOfDeclarationStart: Int): Strin
     return ""
 }
 
-fun adjustIdx(node: KotlinParseTree, tokens: KotlinTokensList, idx: Int): Int {
-    if (!(node.text != null && node.children.isEmpty()) || node.name == "EOF") {
+fun adjustIdx(node: MyNode, tokens: KotlinTokensList, idx: Int): Int {
+    if (!(node.text != null && node.childrenNumber == 0) || node.name == "EOF") {
         return idx
     }
     val text = node.text
@@ -50,7 +56,7 @@ fun adjustIdx(node: KotlinParseTree, tokens: KotlinTokensList, idx: Int): Int {
 }
 
 
-fun findFunctionsAndDocstrings(listOfNodes: List<KotlinParseTree>, tokens: KotlinTokensList, popularLiterals: PopularLiterals): List<Map<String, String>> {
+fun findFunctionsAndDocstrings(listOfNodes: List<MyNode>, tokens: KotlinTokensList, popularLiterals: PopularLiterals): List<Map<String, String>> {
     val result: MutableList<MutableMap<String, String>> = mutableListOf()
     val curFunctionTokens = mutableListOf<KotlinToken>()
     val curBodyTokens = mutableListOf<KotlinToken>()
@@ -64,7 +70,7 @@ fun findFunctionsAndDocstrings(listOfNodes: List<KotlinParseTree>, tokens: Kotli
         if (node.name == "functionDeclaration") {
             var startOfSignature = -1
             while (node.name != "functionBody") {
-                if (node.text != null && node.children.isEmpty()) {
+                if (node.text != null && node.childrenNumber == 0) {
                     if (curFunctionTokens.isEmpty()) {
                         startOfSignature = tokensIdx
                     }
@@ -87,7 +93,7 @@ fun findFunctionsAndDocstrings(listOfNodes: List<KotlinParseTree>, tokens: Kotli
 
             var curlCnt = 1
             while (curlCnt != 0) {
-                if (node.text != null && node.children.isEmpty()) {
+                if (node.text != null && node.childrenNumber == 0) {
                     if (node.name == "LCURL") {
                         curlCnt += 1
                     }
