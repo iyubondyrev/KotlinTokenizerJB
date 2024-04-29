@@ -89,7 +89,6 @@ fun main(args: Array<String>) {
                     }
 
                     if (resultString.isNotEmpty() && tokens.size < threshold) {
-                        println(fullPath)
                         try {
                             root = parseKotlinCode(tokens)
                             listFromNode(root, listOfNodes)
