@@ -8,6 +8,7 @@ import java.io.File
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import org.jetbrains.kotlin.spec.grammar.tools.*
+import java.io.FileNotFoundException
 import java.lang.IndexOutOfBoundsException
 import kotlin.text.Charsets.UTF_8
 
@@ -80,7 +81,17 @@ fun main(args: Array<String>) {
             File("$baseDir/$fileNameWithPaths").bufferedReader(UTF_8).useLines { lines ->
                 lines.forEach { path ->
                     fullPath = "$baseDir/$path"
-                    fileContent = File(fullPath).readText(UTF_8)
+                    try {
+                        fileContent = File(fullPath).readText(UTF_8)
+                    } catch (e: FileNotFoundException) {
+                        // linux is case-sensitive to file names, so we can encounter this errors
+                        println("File not found: $fullPath. Skipping to next file.")
+                        return@forEach
+                    } catch (e: Exception) {
+                        println("An error occurred with file: $fullPath. Error: ${e.message}")
+                        return@forEach
+                    }
+                    // Additional processing for the file if no exceptions are thrown
                     tokens = tokenizeKotlinCode(fileContent)
                     resultString = processTokens(tokens, popularLiterals)
 
