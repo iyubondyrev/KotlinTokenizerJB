@@ -1,0 +1,19 @@
+private fun updateBuildCacheConfig(buildVersions: BuildVersions, destination: File) {
+        // share the same build cache in all projects
+        val buildCacheDir = tempFolder.resolve("build-cache")
+
+        //Gradle 7.0 removed the old syntax
+        val buildCacheLocal =
+            if (buildVersions.gradleVersion >= GradleVersion.version("7.0")) "local" else "local<DirectoryBuildCache>"
+
+        destination.resolve("settings.gradle.kts").appendText(
+            """
+                buildCache {
+                    $buildCacheLocal {
+                        // Set local build cache directory.
+                        directory = File("${buildCacheDir.invariantSeparatorsPath}")
+                    }
+                }
+            """.trimIndent()
+        )
+    }

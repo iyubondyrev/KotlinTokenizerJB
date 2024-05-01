@@ -68,49 +68,41 @@ fun main(args: Array<String>) {
     val resultFileTokenCompletionPath = "$outputDirTokenCompletion/$resultFileTokenCompletion"
     val resultMethodGenerationPath = "$outputDirMethodGeneration/$resultFileMethodGeneration"
 
-    var fullPath: String
-    var fileContent: String
-    var tokens: KotlinTokensList
-    var resultString: String
-    var root: KotlinParseTree
-    val listOfNodes = mutableListOf<MyNode>()
-    var functions: List<Map<String, String>>
 
     File(resultFileTokenCompletionPath).writer(UTF_8).use { writer ->
-        File(resultMethodGenerationPath).writer(UTF_8).use { jsonWriter ->
+        File(resultMethodGenerationPath).bufferedWriter(UTF_8).use { jsonWriter ->
             File("$baseDir/$fileNameWithPaths").bufferedReader(UTF_8).useLines { lines ->
+                var fileContent: String
                 lines.forEach { path ->
-                    fullPath = "$baseDir/$path"
+                    val fullPath = "$baseDir/$path"
                     try {
                         fileContent = File(fullPath).readText(UTF_8)
                     } catch (e: FileNotFoundException) {
                         // linux is case-sensitive to file names, so we can encounter this errors
-                        println("File not found: $fullPath. Skipping to next file.")
+                        //println("File not found: $fullPath. Skipping to next file.")
                         return@forEach
                     } catch (e: Exception) {
-                        println("An error occurred with file: $fullPath. Error: ${e.message}")
+                        //println("An error occurred with file: $fullPath. Error: ${e.message}")
                         return@forEach
                     }
                     // Additional processing for the file if no exceptions are thrown
-                    tokens = tokenizeKotlinCode(fileContent)
-                    resultString = processTokens(tokens, popularLiterals)
+                    val tokens = tokenizeKotlinCode(fileContent)
+                    val resultString = processTokens(tokens, popularLiterals)
 
                     if (resultString.isNotEmpty()) {
                         writer.write("<s> $resultString </s>\n")
                     }
 
-                    if (resultString.isNotEmpty() && tokens.size < threshold) {
+                    if (resultString.isNotEmpty()) {
                         try {
-                            root = parseKotlinCode(tokens)
-                            listFromNode(root, listOfNodes)
-                            functions = findFunctionsAndDocstrings(listOfNodes, tokens, popularLiterals)
+                            val root = parseKotlinCode(tokens)
+                            val functions: List<Map<String, String>> =
+                                findFunctionsAndDocstrings(root, tokens, popularLiterals)
                             functions.forEach { functionMap ->
                                 jsonWriter.write(Json.encodeToString(functionMap) + "\n")
                             }
-                            listOfNodes.clear()
                         } catch (_: KotlinParserException) {
-                        } catch (_: IndexOutOfBoundsException) {
-                        }
+                        } catch (_: IndexOutOfBoundsException) {}
                     }
 
                     fileCount++

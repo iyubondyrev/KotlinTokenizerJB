@@ -3,7 +3,6 @@ package org.tokenizer
 import com.google.common.base.CharMatcher
 import kotlinx.serialization.Serializable
 import org.jetbrains.kotlin.spec.grammar.tools.KotlinToken
-import org.jetbrains.kotlin.spec.grammar.tools.KotlinTokensList
 
 @Serializable
 data class PopularLiterals(

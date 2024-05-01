@@ -4,21 +4,72 @@ import com.google.common.base.CharMatcher
 import junit.framework.TestCase.assertEquals
 import org.jetbrains.kotlin.spec.grammar.tools.*
 
-class MyNode(
-    val name: String,
-    val text: String?,
-    val childrenNumber: Int
-)
 
-fun listFromNode(node: KotlinParseTree, resultList: MutableList<MyNode>) {
-    val myNode = MyNode(name = node.name, text = node.text, childrenNumber = node.children.size)
-    resultList.add(myNode)
+fun getFunDeclarations(node: KotlinParseTree, funcDeclarations: MutableList<KotlinParseTree>) {
+    if (node.name == "functionDeclaration") {
+        funcDeclarations.add(node)
+        return
+    }
     for (child in node.children) {
-        listFromNode(child, resultList)
+        getFunDeclarations(child, funcDeclarations)
     }
 }
 
-fun findDocString(tokens: KotlinTokensList, indexOfDeclarationStart: Int): String {
+fun getFunctionBodyNode(funcDeclarationNode: KotlinParseTree): KotlinParseTree {
+    assertEquals(funcDeclarationNode.name, "functionDeclaration")
+    for (child in funcDeclarationNode.children) {
+        if (child.name == "functionBody") {
+            return child
+        }
+    }
+    return funcDeclarationNode
+}
+
+fun getNodeTokens(node: KotlinParseTree, tokens: MutableList<KotlinToken>, declaration: Boolean = false) {
+    if (node.text != null && node.children.size == 0) {
+        val token = KotlinToken(text = node.text!!, type = node.name, channel = 0)
+        tokens.add(token)
+        return
+    }
+    for (child in node.children) {
+        if (node.name == "functionBody" && declaration) {
+            continue
+        }
+        getNodeTokens(child, tokens, declaration)
+    }
+}
+
+fun getIndexOfDeclarationStart(filteredTokens: List<KotlinToken>, initialPosOfTokens: List<Int>, funcTokens: List<KotlinToken>): Int {
+    if (filteredTokens.isEmpty() || filteredTokens.size < funcTokens.size) return -1
+
+    for (i in 0..filteredTokens.size - funcTokens.size) {
+        var match = true
+        for (j in funcTokens.indices) {
+            if (!(filteredTokens[i + j].text == funcTokens[j].text &&
+                        filteredTokens[i + j].type == funcTokens[j].type &&
+                        filteredTokens[i + j].channel == funcTokens[j].channel)) {
+                match = false
+                break
+            }
+        }
+        if (match) return initialPosOfTokens[i]
+    }
+    return -1
+}
+
+fun getFilteredTokens(tokens: KotlinTokensList): Pair<List<KotlinToken>, List<Int>> {
+    val filteredTokens = mutableListOf<KotlinToken>()
+    val initialPosOfTokens = mutableListOf<Int>()
+    for (i in tokens.indices) {
+        if (tokens[i].channel == 0) {
+            filteredTokens.add(tokens[i])
+            initialPosOfTokens.add(i)
+        }
+    }
+    return Pair(filteredTokens, initialPosOfTokens)
+}
+
+fun getDocstring(tokens: KotlinTokensList, indexOfDeclarationStart: Int): String {
     if (indexOfDeclarationStart == 0) {
         return ""
     }
@@ -40,93 +91,39 @@ fun findDocString(tokens: KotlinTokensList, indexOfDeclarationStart: Int): Strin
     return ""
 }
 
-fun adjustIdx(node: MyNode, tokens: KotlinTokensList, idx: Int): Int {
-    if (!(node.text != null && node.childrenNumber == 0) || node.name == "EOF") {
-        return idx
-    }
-    val text = node.text
-    val type = node.name
-    var newIdx = idx
-    while (!(tokens[newIdx].text == text &&
-                tokens[newIdx].type == type &&
-                tokens[newIdx].channel == 0)) {
-        newIdx += 1
-    }
-    return newIdx
-}
+fun findFunctionsAndDocstrings(root: KotlinParseTree, tokens: KotlinTokensList, popularLiterals: PopularLiterals): List<Map<String, String>> {
+    val result = mutableListOf<Map<String, String>>()
 
+    val functions: MutableList<KotlinParseTree> = mutableListOf()
+    val (filteredTokens, initialPosOfTokens) = getFilteredTokens(tokens)
 
-fun findFunctionsAndDocstrings(listOfNodes: List<MyNode>, tokens: KotlinTokensList, popularLiterals: PopularLiterals): List<Map<String, String>> {
-    val result: MutableList<MutableMap<String, String>> = mutableListOf()
-    val curFunctionTokens = mutableListOf<KotlinToken>()
-    val curBodyTokens = mutableListOf<KotlinToken>()
+    getFunDeclarations(root, functions)
+    for (funcDeclaration in functions) {
+        val funcTokens: MutableList<KotlinToken> = mutableListOf()
+        getNodeTokens(funcDeclaration, funcTokens, declaration = true)
 
-    var tokensIdx = 0
-    var nodeIdx = 0
+        val funcBody = getFunctionBodyNode(funcDeclaration)
+        val bodyTokens: MutableList<KotlinToken> = mutableListOf()
+        getNodeTokens(funcBody, bodyTokens, declaration = false)
 
-    while (nodeIdx < listOfNodes.size) {
-        var node = listOfNodes[nodeIdx]
-        tokensIdx = adjustIdx(node, tokens, tokensIdx)
-        if (node.name == "functionDeclaration") {
-            var startOfSignature = -1
-            while (node.name != "functionBody") {
-                if (node.text != null && node.childrenNumber == 0) {
-                    if (curFunctionTokens.isEmpty()) {
-                        startOfSignature = tokensIdx
-                    }
-                    curFunctionTokens.add((tokens[tokensIdx]))
-                }
-                nodeIdx++
-                node = listOfNodes[nodeIdx]
-                tokensIdx = adjustIdx(node, tokens, tokensIdx)
-            }
-            while (node.name != "LCURL") {
-                nodeIdx++
-                node = listOfNodes[nodeIdx]
-                tokensIdx = adjustIdx(node, tokens, tokensIdx)
-            }
-            curBodyTokens.add((tokens[tokensIdx]))
+        val declarationStart = getIndexOfDeclarationStart(filteredTokens, initialPosOfTokens, funcTokens)
 
-            nodeIdx++
-            node = listOfNodes[nodeIdx]
-            tokensIdx = adjustIdx(node, tokens, tokensIdx)
+        val signature = processTokens(funcTokens, popularLiterals)
+        val body = processTokens(bodyTokens, popularLiterals)
+        var docstring = getDocstring(tokens, declarationStart)
 
-            var curlCnt = 1
-            while (curlCnt != 0) {
-                if (node.text != null && node.childrenNumber == 0) {
-                    if (node.name == "LCURL") {
-                        curlCnt += 1
-                    }
-                    if (node.name == "RCURL") {
-                        curlCnt -= 1
-                    }
-                    curBodyTokens.add((tokens[tokensIdx]))
-                }
-                nodeIdx++
-                node = listOfNodes[nodeIdx]
-                tokensIdx = adjustIdx(node, tokens, tokensIdx)
-            }
-
-            val signature = processTokens(curFunctionTokens, popularLiterals)
-            val body = processTokens(curBodyTokens, popularLiterals)
-            var docstring = findDocString(tokens, startOfSignature)
-
-            if (!CharMatcher.ascii().matchesAllOf(docstring)) {
-                // we do not need nonAscii docstring because BPE will go crazy
-                docstring = ""
-            }
-
-            // let's get rid of unnecessary whitespaces
-            val regex = Regex("[ \t\r]+")
-            docstring = docstring.replace(regex, " ")
-
-            if (body.isNotEmpty() && signature.isNotEmpty()) {
-                result.add(mutableMapOf(("signature" to signature), ("body" to body), ("docstring" to docstring)))
-            }
-            curFunctionTokens.clear()
-            curBodyTokens.clear()
+        if (!CharMatcher.ascii().matchesAllOf(docstring)) {
+            // we do not need nonAscii docstring because BPE will go crazy
+            docstring = ""
         }
-        nodeIdx++
+
+        // let's get rid of unnecessary whitespaces
+        val regex = Regex("[ \t\r]+")
+        docstring = docstring.replace(regex, " ")
+
+        if (body.isNotEmpty() && signature.isNotEmpty()) {
+            result.add(mutableMapOf(("signature" to signature), ("body" to body), ("docstring" to docstring)))
+        }
     }
     return result
 }
