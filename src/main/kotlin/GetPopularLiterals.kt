@@ -56,9 +56,9 @@ fun updatePopularLiterals(tokens: KotlinTokensList, stringLiterals: MutableMap<S
 fun main(args: Array<String>) {
     val options = Options()
     options.addOption("b", "base_dir", true, "Base directory")
-    options.addOption("f", "file_names", true, "File names with paths")
-    options.addOption("bf", "bad_file", true, "File with bad files")
-    options.addOption("l", "literal_file", true, "Literal file")
+    options.addOption("f", "file_names", true, "File with paths for the data files")
+    options.addOption("bf", "bad_file", true, "File in which paths of the bad files will be written")
+    options.addOption("l", "literal_file", true, "Result file with popular literals")
 
     val parser = DefaultParser()
     val cmd = try {

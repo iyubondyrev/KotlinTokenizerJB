@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     options.addOption("b", "base_dir", true, "Base directory")
     options.addOption("ot", "output_dir_token_completion", true, "Output directory for token completion")
     options.addOption("om", "output_dir_method_generation", true, "Output directory for method generation")
-    options.addOption("f", "file_names", true, "File names with paths")
+    options.addOption("f", "file_names", true, "File with paths for the data files")
     options.addOption("rt", "result_file_token_completion", true, "Result file for token completion")
     options.addOption("rm", "result_file_method_generation", true, "Result file for method generation")
     options.addOption("l", "literal_file_path", true, "Literal file")
